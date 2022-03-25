@@ -10,9 +10,17 @@ const Filter = ({ filter, handleFilter }) => {
 }
 
 
-const Countries = ({ countries, filter }) => {
+const Countries = ({ countries, filter, handleFilter }) => {
   const countriesToShow = countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
   console.log('countriesToShow', countriesToShow)
+
+  const handleButton = (country) => {    
+    const handler = () => {
+      handleFilter(country.name.common)
+    }
+    return handler
+  }
+
 
   if (countriesToShow.length > 10) {
     return (
@@ -23,36 +31,43 @@ const Countries = ({ countries, filter }) => {
     return (
       <div>
         {countriesToShow.map(country =>
-          <div key={country.name.common}>{country.name.common}</div>
+          <div key={country.name.common}>
+            {country.name.common}
+            <button onClick={handleButton(country)}>show</button>
+            
+          </div>
         )}
       </div>
     )
   }
 
-  const languages = countriesToShow.map(country => country.languages)
-  const flag = countriesToShow.map(country => country.flags.png)
+  return (
+    <div>
+      {countriesToShow.map(country =>
+        <Country country={country} />
+      )}
+    </div>
+  )
+}
+
+const Country = ({ country }) => {
+  const languages = country.languages
+  const flag = country.flags.png
   console.log(languages)
 
   return (
     <div>
-      {countriesToShow.map(country =>
-        <div key={country.name.common}>
-          <h1>{country.name.common}</h1>
-          capital {country.capital} <br />
-          area {country.area}
-        </div>
-      )}
-      <div>
-        <h3>languages:</h3>
-        <ul>
-          {Object.entries(languages[0]).map(([key, value]) =>
-            <li>{value}</li>
-          )}
-        </ul>
-      </div>
-      <div>
-        <img src={flag} width="100" height="100" />
-      </div>
+      <h1>{country.name.common}</h1>
+      capital {country.capital} <br />
+      area {country.area}
+
+      <h3>languages:</h3>
+      <ul>
+        {Object.entries(languages).map(([key, value]) =>
+          <li key={value}>{value}</li>
+        )}
+      </ul>
+      <img src={flag} width="100" height="100" />
     </div>
   )
 }
@@ -81,7 +96,7 @@ const App = () => {
 
       <Filter filter={newFilter} handleFilter={handleFilterChange} />
 
-      <Countries countries={countries} filter={newFilter} />
+      <Countries countries={countries} filter={newFilter} handleFilter={setNewFilter} />
 
     </div>
   )
