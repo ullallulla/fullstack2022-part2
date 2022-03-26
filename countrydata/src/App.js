@@ -10,7 +10,7 @@ const Filter = ({ filter, handleFilter }) => {
 }
 
 
-const Countries = ({ countries, filter, handleFilter }) => {
+const Countries = ({ countries, filter, handleFilter, apiKey, weather, setWeather }) => {
   const countriesToShow = countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
   console.log('countriesToShow', countriesToShow)
 
@@ -44,16 +44,44 @@ const Countries = ({ countries, filter, handleFilter }) => {
   return (
     <div>
       {countriesToShow.map(country =>
-        <Country country={country} />
+        <Country key={country.name.common} country={country} apiKey={apiKey} weather={weather} setWeather={setWeather}/>
       )}
     </div>
   )
 }
 
-const Country = ({ country }) => {
+const Country = ({ country, apiKey, weather, setWeather }) => {
+  
+
   const languages = country.languages
   const flag = country.flags.png
+  console.log(country.capitalInfo.latlng)
+  const latitude = country.capitalInfo.latlng[0]
+  const longitude = country.capitalInfo.latlng[1]
   console.log(languages)
+  //console.log(latitude, longitude, apiKey)
+  useEffect(() => {
+    console.log('effectasd')
+    axios
+      //.get('https://restcountries.com/v3.1/all')
+      .get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`)
+      .then(response => {
+        console.log('promise fulfilled asd')
+        console.log(response.data, 'response')
+        /* setWeather(weather => (
+          {
+            weather,
+            ...response.data
+          }
+        )) */
+        let weatherData = []
+        weatherData.push(response.data)
+        setWeather(weatherData)
+
+      })
+  }, [])
+
+  console.log(weather, 'this is weather')
 
   return (
     <div>
@@ -68,13 +96,41 @@ const Country = ({ country }) => {
         )}
       </ul>
       <img src={flag} width="100" height="100" />
+      {weather.map(w => 
+        <Weather key={w.name} weather={w} capital={country.capital}/>
+        )}
+      
     </div>
+  )
+}
+// https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
+const Weather = ({weather, capital}) => {
+  console.log(weather, 'qwe')
+  
+  const weatherIcon = weather.weather[0].icon
+  console.log(weatherIcon)
+  const weatherIconURL = `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`
+
+  console.log(weatherIcon, weatherIconURL)
+  return (
+    <div>
+      <h2>Weather in {capital}</h2>
+      <div>temperature {Math.round(((weather.main.temp - 273.15) + Number.EPSILON) * 100) / 100} Celcius</div>
+      <img src={weatherIconURL} width="100" height="100" />
+      <div>wind {weather.wind.speed} m/s</div>
+    </div>
+  )
+  return (
+    <div>asd</div>
   )
 }
 
 const App = () => {
   const [countries, setCountries] = useState([])
   const [newFilter, setNewFilter] = useState('')
+  const [weather, setWeather] = useState([])
+
+  const api_key = process.env.REACT_APP_API_KEY
 
   useEffect(() => {
     console.log('effect')
@@ -96,7 +152,7 @@ const App = () => {
 
       <Filter filter={newFilter} handleFilter={handleFilterChange} />
 
-      <Countries countries={countries} filter={newFilter} handleFilter={setNewFilter} />
+      <Countries countries={countries} filter={newFilter} handleFilter={setNewFilter} apiKey={api_key} weather={weather} setWeather={setWeather}/>
 
     </div>
   )
