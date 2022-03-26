@@ -120,9 +120,6 @@ const Weather = ({weather, capital}) => {
       <div>wind {weather.wind.speed} m/s</div>
     </div>
   )
-  return (
-    <div>asd</div>
-  )
 }
 
 const App = () => {
