@@ -9,7 +9,7 @@ const Filter = ({ filter, handleFilter }) => {
   )
 }
 
-const PersonForm = ({addPerson, name, number, handleName, handleNumber}) => {
+const PersonForm = ({ addPerson, name, number, handleName, handleNumber }) => {
   return (
     <form onSubmit={addPerson}>
       <div>
@@ -25,14 +25,14 @@ const PersonForm = ({addPerson, name, number, handleName, handleNumber}) => {
   )
 }
 
-const Persons = ({persons, filter}) => {
+const Persons = ({ persons, filter }) => {
   const personsToShow = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
 
   return (
     <div>
-    {personsToShow.map(person =>
-      <div key={person.name}>{person.name} {person.number}</div>
-    )}
+      {personsToShow.map(person =>
+        <div key={person.name}>{person.name} {person.number}</div>
+      )}
     </div>
   )
 }
@@ -46,11 +46,11 @@ const App = () => {
   useEffect(() => {
     console.log('effect')
     axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
-    })
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('promise fulfilled')
+        setPersons(response.data)
+      })
   }, [])
 
   const addPerson = (event) => {
@@ -63,9 +63,13 @@ const App = () => {
       window.alert(`${newName} is already added to phonebook`)
     }
     else {
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+      axios
+        .post('http://localhost:3001/persons', personObject)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
@@ -90,12 +94,12 @@ const App = () => {
 
       <h3>Add a new</h3>
 
-      <PersonForm addPerson={addPerson} name={newName} number={newNumber} handleName={handleNameChange} handleNumber={handleNumberChange}/>
+      <PersonForm addPerson={addPerson} name={newName} number={newNumber} handleName={handleNameChange} handleNumber={handleNumberChange} />
 
       <h2>Numbers</h2>
 
       <Persons persons={persons} filter={newFilter} />
-      
+
     </div>
   )
 }
