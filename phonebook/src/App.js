@@ -40,11 +40,24 @@ const Persons = ({ persons, filter, deletePerson }) => {
   )
 }
 
+const Notification = ({message}) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="notification">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     personService
@@ -65,12 +78,18 @@ const App = () => {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const changedNumber = { ...person, number: newNumber }
         personService
-        .update(person.id, changedNumber)
-        .then(returnedPerson => {
-          setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
-          setNewName('')
-          setNewNumber('')
-        })
+          .update(person.id, changedNumber)
+          .then(returnedPerson => {
+            setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
+            setNewName('')
+            setNewNumber('')
+            setNotification(
+              `${newName} number has been changed to ${newNumber}`
+            )
+            setTimeout(() => {
+              setNotification(null)
+            }, 3000)
+          })
       }
     }
     else {
@@ -78,6 +97,10 @@ const App = () => {
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          setNotification(`Added ${newName}`)
+          setTimeout(() => {
+            setNotification(null)
+          }, 3000)
           setNewName('')
           setNewNumber('')
         })
@@ -110,7 +133,7 @@ const App = () => {
     <div>
 
       <h2>Phonebook</h2>
-
+      <Notification message={notification} />
       <Filter filter={newFilter} handleFilter={handleFilterChange} />
 
       <h3>Add a new</h3>
