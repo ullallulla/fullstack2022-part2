@@ -1,68 +1,11 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
+import Filter from './components/Filter'
+import Notification from './components/Notification'
+import ErrorMessage from './components/ErrorMessage'
 import personService from './services/personService'
 
-const Filter = ({ filter, handleFilter }) => {
-  return (
-    <div>
-      filter shown with <input value={filter} onChange={handleFilter} />
-    </div>
-  )
-}
-
-const PersonForm = ({ addPerson, name, number, handleName, handleNumber }) => {
-  return (
-    <form onSubmit={addPerson}>
-      <div>
-        name: <input value={name} onChange={handleName} />
-      </div>
-      <div>
-        number: <input value={number} onChange={handleNumber} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
-}
-
-const Persons = ({ persons, filter, deletePerson }) => {
-  const personsToShow = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
-
-  return (
-    <div>
-      {personsToShow.map(person =>
-        <div key={person.name}>{person.name} {person.number}
-          <button onClick={() => deletePerson(person.id)}>delete</button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-const Notification = ({message}) => {
-  if (message === null) {
-    return null
-  }
-
-  return (
-    <div className="notification">
-      {message}
-    </div>
-  )
-}
-
-const ErrorMessage = ({message}) => {
-  if (message === null) {
-    return null
-  }
-
-  return (
-    <div className="errorMessage">
-      {message}
-    </div>
-  )
-}
 
 const App = () => {
   const [persons, setPersons] = useState([])
